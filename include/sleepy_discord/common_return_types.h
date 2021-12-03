@@ -64,6 +64,13 @@ namespace SleepyDiscord {
 			return operator Type();
 		}
 
+                inline Type get()
+                {
+                  Type obj;
+                  cast(obj);
+                  return obj;
+                }
+
 		inline Type cast() {
 			return operator Type();
 		}
