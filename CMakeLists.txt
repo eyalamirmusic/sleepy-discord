@@ -195,13 +195,13 @@ if(USE_CPR)
 	#so use system curl
 	set(USE_SYSTEM_CURL ON CACHE BOOL "")
 
-	add_subdirectory(deps/cpr)
+#	add_subdirectory(deps/cpr)
 endif()
 
 if(USE_WEBSOCKETPP)
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
 	find_package(Threads REQUIRED)
-	add_subdirectory(deps/websocketpp)
+#	add_subdirectory(deps/websocketpp)
 endif()
 
 if(USE_LIBOPUS)
