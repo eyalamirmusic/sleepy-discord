@@ -64,6 +64,7 @@ if (NOT ONLY_SLEEPY_DISCORD)
 	endif()
 
 	if(USE_ASIO)
+        message("Asio")
 		target_include_directories(sleepy-discord PUBLIC ${asio_SOURCE_DIR}/asio/include)
 		target_compile_definitions(sleepy-discord PUBLIC EXISTENT_ASIO)
 	elseif(USE_BOOST_ASIO)

@@ -6,6 +6,7 @@ if (APPLE AND NOT DEFINED ${OPENSSL_ROOT_DIR})
 endif()
 
 find_package(OpenSSL REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
 
 option(BUILD_EXAMPLES                "Build examples of Sleepy Discord and all dependencies"              OFF)
 option(SLEEPY_DISCORD_BUILD_EXAMPLES "Build examples of Sleepy Discord"                                   OFF)
