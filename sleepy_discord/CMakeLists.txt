@@ -1,39 +1,39 @@
 add_library(sleepy-discord STATIC
-	asio_udp.cpp
-	attachment.cpp
-	channel.cpp
-	client.cpp
-	cpr_session.cpp
-	default_functions.cpp
-	embed.cpp
-	endpoints.cpp
-	gateway.cpp
-	http.cpp
-	invite.cpp
-	json_wrapper.cpp
-	message.cpp
-	permissions.cpp
-	sd_error.cpp
-	server.cpp
-	user.cpp
-	uwebsockets_websocket.cpp
-	voice.cpp
-	voice_connection.cpp
-	webhook.cpp
-	websocketpp_websocket.cpp
-	zlib-ng_compression.cpp
-)
+        asio_udp.cpp
+        attachment.cpp
+        channel.cpp
+        client.cpp
+        cpr_session.cpp
+        default_functions.cpp
+        embed.cpp
+        endpoints.cpp
+        gateway.cpp
+        http.cpp
+        invite.cpp
+        json_wrapper.cpp
+        message.cpp
+        permissions.cpp
+        sd_error.cpp
+        server.cpp
+        user.cpp
+        uwebsockets_websocket.cpp
+        voice.cpp
+        voice_connection.cpp
+        webhook.cpp
+        websocketpp_websocket.cpp
+        zlib-ng_compression.cpp
+        )
 
 target_include_directories(sleepy-discord
-	PUBLIC
-		${PROJECT_SOURCE_DIR}/include
-		${PROJECT_SOURCE_DIR}/deps/include
-	PRIVATE
-		${PROJECT_SOURCE_DIR}/include/sleepy_discord
-)
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/deps/include
+        PRIVATE
+        ${PROJECT_SOURCE_DIR}/include/sleepy_discord
+        )
 
 set(SLEEPY_INCLUDE_NONEXIST
-	${PROJECT_SOURCE_DIR}/include/sleepy_discord/IncludeNonexistent)
+        ${PROJECT_SOURCE_DIR}/include/sleepy_discord/IncludeNonexistent)
 
 #The codebase is c++11 but both clang and visual c++ have issues with c++11
 #These issues are fixed by using preprocessor defines to replace code that
@@ -44,123 +44,131 @@ target_compile_features(sleepy-discord PUBLIC cxx_std_11 cxx_return_type_deducti
 target_compile_definitions(sleepy-discord PUBLIC SLEEPY_DISCORD_CMAKE)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	target_compile_options(sleepy-discord PUBLIC -W3)
-else()
-	target_compile_options(sleepy-discord PUBLIC -Wall)
-endif()
+    target_compile_options(sleepy-discord PUBLIC -W3)
+else ()
+    target_compile_options(sleepy-discord PUBLIC -Wall)
+endif ()
 
 if (NOT ONLY_SLEEPY_DISCORD)
-	#for some reason you a limited ammount of target_link_libraries calls
-	set(LIBRARIES_TO_LINK)
-	if(USE_CPR)
-		if(CURL_STATICLIB)
-			target_compile_definitions(${CPR_LIBRARIES} PUBLIC CURL_STATICLIB)
-		endif()
-		target_include_directories(sleepy-discord PUBLIC ${CPR_INCLUDE_DIRS})
-		list(APPEND LIBRARIES_TO_LINK "${CPR_LIBRARIES}")
-		target_compile_definitions(sleepy-discord PUBLIC EXISTENT_CPR)
-	else()
-		target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_CPR)
-	endif()
+    #for some reason you a limited ammount of target_link_libraries calls
+    set(LIBRARIES_TO_LINK)
+    if (USE_CPR)
+        if (CURL_STATICLIB)
+            target_compile_definitions(${CPR_LIBRARIES} PUBLIC CURL_STATICLIB)
+        endif ()
+        target_include_directories(sleepy-discord PUBLIC ${CPR_INCLUDE_DIRS})
+        list(APPEND LIBRARIES_TO_LINK "${CPR_LIBRARIES}")
+        target_compile_definitions(sleepy-discord PUBLIC EXISTENT_CPR)
+    else ()
+        target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_CPR)
+    endif ()
 
-	if(USE_ASIO)
+    if (USE_ASIO)
         message("Asio")
-		target_include_directories(sleepy-discord PUBLIC ${asio_SOURCE_DIR}/asio/include)
-		target_compile_definitions(sleepy-discord PUBLIC EXISTENT_ASIO)
-	elseif(USE_BOOST_ASIO)
-		target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_ASIO)
-		#Look for boost as an alt
-		find_package(Boost)
-		if(Boost_FOUND)
-			list(APPEND LIBRARIES_TO_LINK ${Boost_INCLUDE_DIRS})
-			target_compile_definitions(sleepy-discord PUBLIC EXISTENT_BOOST_ASIO)
-		else()
-			target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_BOOST_ASIO)
-		endif()
-	endif()
+        target_include_directories(sleepy-discord PUBLIC ${asio_SOURCE_DIR}/asio/include)
+        target_compile_definitions(sleepy-discord PUBLIC EXISTENT_ASIO)
+    elseif (USE_BOOST_ASIO)
+        target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_ASIO)
+        #Look for boost as an alt
+        find_package(Boost)
+        if (Boost_FOUND)
+            list(APPEND LIBRARIES_TO_LINK ${Boost_INCLUDE_DIRS})
+            target_compile_definitions(sleepy-discord PUBLIC EXISTENT_BOOST_ASIO)
+        else ()
+            target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_BOOST_ASIO)
+        endif ()
+    endif ()
 
-	if(USE_WEBSOCKETPP)
-		target_include_directories(sleepy-discord PUBLIC ${websocketpp_SOURCE_DIR})
-		if (WIN32)
-			find_package(OpenSSL REQUIRED)
-			list(APPEND LIBRARIES_TO_LINK "OpenSSL::SSL" "OpenSSL::Crypto")
-		elseif (UNIX)
-			list(APPEND LIBRARIES_TO_LINK "ssl" "crypto" "Threads::Threads")
-		endif()
-		target_compile_definitions(sleepy-discord PUBLIC EXISTENT_WEBSOCKETPP)
-	else()
-		target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_WEBSOCKETPP)
-	endif()
+    if (USE_WEBSOCKETPP)
+        target_include_directories(sleepy-discord PUBLIC ${websocketpp_SOURCE_DIR})
+        if (WIN32)
+            find_package(OpenSSL REQUIRED)
+            list(APPEND LIBRARIES_TO_LINK "OpenSSL::SSL" "OpenSSL::Crypto")
+        elseif (APPLE)
+            if (APPLE AND NOT DEFINED ${OPENSSL_ROOT_DIR})
+                set(OPENSSL_ROOT_DIR "/opt/homebrew/opt/openssl@1.1")
+            endif ()
 
-	if(USE_UWEBSOCKETS)
-		find_library(LIB_UWS uWS
-			PATHS ${uwebsockets_SOURCE_DIR}/lib
-		)
-		target_include_directories(sleepy-discord PUBLIC ${uwebsockets_SOURCE_DIR}/include)
-		list(APPEND LIBRARIES_TO_LINK "${LIB_UWS}")
-		target_compile_definitions(sleepy-discord PUBLIC EXISTENT_UWEBSOCKETS)
-	else()
-		target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_UWEBSOCKETS)
-	endif()
+            find_package(OpenSSL REQUIRED)
+            target_include_directories(sleepy-discord PUBLIC ${OPENSSL_INCLUDE_DIR})
+            list(APPEND LIBRARIES_TO_LINK "OpenSSL::SSL" "OpenSSL::Crypto" "Threads::Threads")
+        elseif (UNIX)
+            list(APPEND LIBRARIES_TO_LINK "ssl" "crypto" "Threads::Threads")
+        endif ()
+        target_compile_definitions(sleepy-discord PUBLIC EXISTENT_WEBSOCKETPP)
+    else ()
+        target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_WEBSOCKETPP)
+    endif ()
 
-	if(USE_LIBOPUS)
-		target_include_directories(sleepy-discord PUBLIC ${opus_SOURCE_DIR}/include)
-		list(APPEND LIBRARIES_TO_LINK "opus")
-		target_compile_definitions(sleepy-discord PUBLIC EXISTENT_OPUS)
-	else()
-		target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_OPUS)
-	endif()
+    if (USE_UWEBSOCKETS)
+        find_library(LIB_UWS uWS
+                PATHS ${uwebsockets_SOURCE_DIR}/lib
+                )
+        target_include_directories(sleepy-discord PUBLIC ${uwebsockets_SOURCE_DIR}/include)
+        list(APPEND LIBRARIES_TO_LINK "${LIB_UWS}")
+        target_compile_definitions(sleepy-discord PUBLIC EXISTENT_UWEBSOCKETS)
+    else ()
+        target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_UWEBSOCKETS)
+    endif ()
 
-	if(USE_LIBSODIUM)
-		if (WIN32)
-			find_package(unofficial-sodium CONFIG REQUIRED)
-			list(APPEND LIBRARIES_TO_LINK "unofficial-sodium::sodium")
-			find_path(SODIUM_INCLUDE_DIR NAMES sodium.h)
-			target_include_directories(sleepy-discord PUBLIC ${SODIUM_INCLUDE_DIR})
-		else()
-			add_dependencies(sleepy-discord libsodium-make)
-			ExternalProject_Get_property(libsodium-make BINARY_DIR)
-			set(libsodium-make_BINARY_DIR ${BINARY_DIR})
-			set(
-				LIB_SODIUM_BUILDS 
-				${libsodium-make_BINARY_DIR}/src/libsodium/.libs/${CMAKE_STATIC_LIBRARY_PREFIX}sodium${CMAKE_STATIC_LIBRARY_SUFFIX}
-			)
-			target_include_directories(
-				sleepy-discord PUBLIC
-				${libsodium_SOURCE_DIR}/src/libsodium/include
-				${libsodium-make_BINARY_DIR}/src/libsodium/include
-			)
-			list(APPEND LIBRARIES_TO_LINK "${LIB_SODIUM_BUILDS}")
-		endif()
-		target_compile_definitions(sleepy-discord PUBLIC EXISTENT_SODIUM)
-	else()
-		target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)
-	endif()
+    if (USE_LIBOPUS)
+        target_include_directories(sleepy-discord PUBLIC ${opus_SOURCE_DIR}/include)
+        list(APPEND LIBRARIES_TO_LINK "opus")
+        target_compile_definitions(sleepy-discord PUBLIC EXISTENT_OPUS)
+    else ()
+        target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_OPUS)
+    endif ()
 
-	if(USE_ZLIB_NG)
-		get_target_property(ZLIB_BINARY_DIR zlib BINARY_DIR)
-		target_include_directories(sleepy-discord PUBLIC ${zlib-ng_SOURCE_DIR}/../ ${ZLIB_BINARY_DIR})
-		list(APPEND LIBRARIES_TO_LINK "zlib")
-		target_compile_definitions(sleepy-discord PUBLIC EXISTENT_ZLIB_NG)
-	else()
-		target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_ZLIB_NG)
-	endif()
-	target_link_libraries(sleepy-discord PUBLIC ${LIBRARIES_TO_LINK})
-else()
-	target_compile_definitions(sleepy-discord PUBLIC
-		NONEXISTENT_CPR
-		NONEXISTENT_ASIO
-		NONEXISTENT_BOOST_ASIO
-		NONEXISTENT_WEBSOCKETPP
-		NONEXISTENT_UWEBSOCKETS
-		NONEXISTENT_OPUS
-		NONEXISTENT_SODIUM)
-endif()
+    if (USE_LIBSODIUM)
+        if (WIN32)
+            find_package(unofficial-sodium CONFIG REQUIRED)
+            list(APPEND LIBRARIES_TO_LINK "unofficial-sodium::sodium")
+            find_path(SODIUM_INCLUDE_DIR NAMES sodium.h)
+            target_include_directories(sleepy-discord PUBLIC ${SODIUM_INCLUDE_DIR})
+        else ()
+            add_dependencies(sleepy-discord libsodium-make)
+            ExternalProject_Get_property(libsodium-make BINARY_DIR)
+            set(libsodium-make_BINARY_DIR ${BINARY_DIR})
+            set(
+                    LIB_SODIUM_BUILDS
+                    ${libsodium-make_BINARY_DIR}/src/libsodium/.libs/${CMAKE_STATIC_LIBRARY_PREFIX}sodium${CMAKE_STATIC_LIBRARY_SUFFIX}
+            )
+            target_include_directories(
+                    sleepy-discord PUBLIC
+                    ${libsodium_SOURCE_DIR}/src/libsodium/include
+                    ${libsodium-make_BINARY_DIR}/src/libsodium/include
+            )
+            list(APPEND LIBRARIES_TO_LINK "${LIB_SODIUM_BUILDS}")
+        endif ()
+        target_compile_definitions(sleepy-discord PUBLIC EXISTENT_SODIUM)
+    else ()
+        target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)
+    endif ()
 
-if(NOT Git_FOUND)
-	target_compile_definitions(sleepy-discord PRIVATE NONEXISTANT_GIT_INFO)
-endif()
+    if (USE_ZLIB_NG)
+        get_target_property(ZLIB_BINARY_DIR zlib BINARY_DIR)
+        target_include_directories(sleepy-discord PUBLIC ${zlib-ng_SOURCE_DIR}/../ ${ZLIB_BINARY_DIR})
+        list(APPEND LIBRARIES_TO_LINK "zlib")
+        target_compile_definitions(sleepy-discord PUBLIC EXISTENT_ZLIB_NG)
+    else ()
+        target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_ZLIB_NG)
+    endif ()
+    target_link_libraries(sleepy-discord PUBLIC ${LIBRARIES_TO_LINK})
+else ()
+    target_compile_definitions(sleepy-discord PUBLIC
+            NONEXISTENT_CPR
+            NONEXISTENT_ASIO
+            NONEXISTENT_BOOST_ASIO
+            NONEXISTENT_WEBSOCKETPP
+            NONEXISTENT_UWEBSOCKETS
+            NONEXISTENT_OPUS
+            NONEXISTENT_SODIUM)
+endif ()
 
-if(ENABLE_VOICE)
-	target_compile_definitions(sleepy-discord PUBLIC SLEEPY_VOICE_ENABLED)
-endif()
+if (NOT Git_FOUND)
+    target_compile_definitions(sleepy-discord PRIVATE NONEXISTANT_GIT_INFO)
+endif ()
+
+if (ENABLE_VOICE)
+    target_compile_definitions(sleepy-discord PUBLIC SLEEPY_VOICE_ENABLED)
+endif ()
