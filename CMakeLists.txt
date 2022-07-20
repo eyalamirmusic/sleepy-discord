@@ -1,6 +1,12 @@
 cmake_minimum_required (VERSION 3.16)
 project(sleepy-discord)
 
+if (APPLE AND NOT DEFINED ${OPENSSL_ROOT_DIR})
+    set(OPENSSL_ROOT_DIR "/opt/homebrew/opt/openssl@1.1")
+endif()
+
+find_package(OpenSSL REQUIRED)
+
 option(BUILD_EXAMPLES                "Build examples of Sleepy Discord and all dependencies"              OFF)
 option(SLEEPY_DISCORD_BUILD_EXAMPLES "Build examples of Sleepy Discord"                                   OFF)
 option(ONLY_SLEEPY_DISCORD           "Sleepy Discord but none of the dependencies, except build in onces" OFF)
