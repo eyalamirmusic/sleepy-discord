@@ -152,13 +152,17 @@ struct MessageRevisions {
   const json::Value &RevisionsJSON;
 };
 
-struct MessageReference {
+struct MessageReference : DiscordObject {
 
   MessageReference() = default;
   MessageReference(const Message &message) {
     messageID = message.ID;
     channelID = message.channelID;
     serverID = message.serverID;
+  }
+
+  bool empty() const {
+    return messageID.empty() && channelID.empty() && serverID.empty();
   }
 
   Snowflake<Message> messageID;
@@ -192,8 +196,9 @@ struct SendMessageParams : DiscordObject {
 
       json::pair(&SendMessageParams::content, "content", json::REQUIRIED_FIELD),
       json::pair(&SendMessageParams::tts, "tts", json::OPTIONAL_FIELD),
-      json::pair(&SendMessageParams::embed, "embed", json::OPTIONAL_FIELD));
-  json::pair(&SendMessageParams::messageReference, "message_reference", json::OPTIONAL_FIELD));
+      json::pair(&SendMessageParams::embed, "embed", json::OPTIONAL_FIELD),
+      json::pair(&SendMessageParams::messageReference, "message_reference",
+                 json::OPTIONAL_FIELD));
   JSONStructEnd
 };
 } // namespace SleepyDiscord
