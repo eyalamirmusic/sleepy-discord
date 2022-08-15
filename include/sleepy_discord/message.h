@@ -184,7 +184,8 @@ struct SendMessageParams : DiscordObject {
   SendMessageParams() = default;
   SendMessageParams(const Message &messageToUse,
                     const std::string &contentToUse)
-      : messageReference(messageToUse), content(contentToUse) {}
+      : channelID(messageToUse.channelID), messageReference(messageToUse),
+        content(contentToUse) {}
 
   Snowflake<Channel> channelID;
   std::string content = {};
