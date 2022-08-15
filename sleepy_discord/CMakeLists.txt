@@ -86,7 +86,7 @@ if (NOT ONLY_SLEEPY_DISCORD)
             list(APPEND LIBRARIES_TO_LINK "OpenSSL::SSL" "OpenSSL::Crypto")
         elseif (APPLE)
             if (NOT DEFINED ${OPEN_SSL_ROOT_DIR})
-                set(OPEN_SSLROOT_DIR "/opt/homebrew/opt/openssl@1.1" CACHE INTERNAL "")
+                set(OPEN_SSL_ROOT_DIR "/opt/homebrew/opt/openssl@1.1" CACHE INTERNAL "")
 
                 if (NOT EXISTS ${OPEN_SSL_ROOT_DIR})
                     set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl@1.1" CACHE INTERNAL "")
