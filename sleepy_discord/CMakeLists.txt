@@ -44,7 +44,7 @@ target_compile_features(sleepy-discord PUBLIC cxx_std_11 cxx_return_type_deducti
 target_compile_definitions(sleepy-discord PUBLIC SLEEPY_DISCORD_CMAKE)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    target_compile_options(sleepy-discord PUBLIC -W3)
+#    target_compile_options(sleepy-discord PUBLIC -W3)
 else ()
     target_compile_options(sleepy-discord PUBLIC -Wall)
 endif ()

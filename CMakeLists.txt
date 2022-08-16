@@ -278,5 +278,5 @@ if (SLEEPY_DISCORD_BUILD_EXAMPLES)
 	endif()
 endif()
 
-target_compile_options(sleepy-discord PRIVATE -w)
+#target_compile_options(sleepy-discord PRIVATE -w)
 target_link_libraries(sleepy-discord PRIVATE websocketpp)
